@@ -1,0 +1,44 @@
+{
+  "name": "sentrix-sdk",
+  "version": "2.0.0",
+  "description": "JavaScript/Node.js SDK for Sentrix — AI Agent Governance, Runtime IAM & Anomaly Detection",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node -e \"const S = require('./src'); console.log('✅ sentrix-sdk loads successfully');\"",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "security",
+    "governance",
+    "iam",
+    "sdk",
+    "sentrix",
+    "anomaly-detection",
+    "authorization",
+    "policy-engine",
+    "ai-agent",
+    "runtime-security"
+  ],
+  "author": "Sentrix Team",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sentrix-ai/sentrix.git"
+  },
+  "homepage": "https://github.com/sentrix-ai/sentrix#readme",
+  "bugs": {
+    "url": "https://github.com/sentrix-ai/sentrix/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {}
+}

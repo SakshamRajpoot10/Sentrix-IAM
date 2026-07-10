@@ -1,0 +1,40 @@
+# ═══════════════════════════════════════════════════════════════
+# SENTRIX — Development Profile
+# ═══════════════════════════════════════════════════════════════
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sentrix
+    username: sentrix
+    password: sentrix_dev
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ""
+
+  flyway:
+    clean-disabled: false
+
+# ─── Dev-specific logging ────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.sentrix: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+
+# ─── ML Service (local) ─────────────────────────────────────
+ml:
+  service-url: http://localhost:8000
+  enabled: true
+
+# ─── CORS for dev ────────────────────────────────────────────
+app:
+  cors-origins: http://localhost:5173,http://localhost:3000

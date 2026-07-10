@@ -1,0 +1,7 @@
+[tool.pyrefly]
+# Exclude SDK from in-memory virtual analysis 
+# that incorrectly parses docstrings as code
+exclude = [
+    "**/sdk/**",
+    "**/ml/**",
+]

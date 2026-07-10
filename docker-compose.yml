@@ -1,0 +1,148 @@
+# ═══════════════════════════════════════════════════════════════
+# SENTRIX — Production Docker Compose Stack
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # ─── PostgreSQL 17 ─────────────────────────────────────────
+  postgres:
+    image: postgres:17-alpine
+    container_name: sentrix-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sentrix}
+      POSTGRES_USER: ${DB_USER:-sentrix}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sentrix_dev}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sentrix} -d ${DB_NAME:-sentrix}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sentrix-network
+
+  # ─── Redis 7.4 ─────────────────────────────────────────────
+  redis:
+    image: redis:7.4-alpine
+    container_name: sentrix-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sentrix-network
+
+  # ─── Java Backend (Spring Boot 3.3) ────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sentrix-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-sentrix}
+      DB_USER: ${DB_USER:-sentrix}
+      DB_PASSWORD: ${DB_PASSWORD:-sentrix_dev}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET}
+      ML_SERVICE_URL: http://ml:8000
+      ML_INTERNAL_API_KEY: ${ML_INTERNAL_API_KEY}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8080:8080"
+    networks:
+      - sentrix-network
+
+  # ─── Python ML Service (FastAPI) ───────────────────────────
+  ml:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile
+    container_name: sentrix-ml
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-sentrix}:${DB_PASSWORD:-sentrix_dev}@postgres:5432/${DB_NAME:-sentrix}
+      ML_API_KEY: ${ML_INTERNAL_API_KEY}
+      MODEL_DIR: /app/models/saved
+    ports:
+      - "8000:8000"
+    volumes:
+      - ml_models:/app/models/saved
+    networks:
+      - sentrix-network
+
+  # ─── React Frontend (Vite) ─────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sentrix-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - sentrix-network
+
+  # ─── Nginx Reverse Proxy ───────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: sentrix-nginx
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx_certs:/etc/nginx/certs
+    networks:
+      - sentrix-network
+
+# ─── Volumes ─────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  ml_models:
+    driver: local
+  nginx_certs:
+    driver: local
+
+# ─── Network ─────────────────────────────────────────────────
+networks:
+  sentrix-network:
+    driver: bridge
+    name: sentrix-network

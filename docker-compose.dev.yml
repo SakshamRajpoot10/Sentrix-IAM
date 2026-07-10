@@ -1,0 +1,48 @@
+# ═══════════════════════════════════════════════════════════════
+# SENTRIX — Development Docker Compose Overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: postgres
+      JWT_ACCESS_SECRET: sentrix-dev-access-secret-key-must-be-at-least-256-bits-long-for-hs256
+      JWT_REFRESH_SECRET: sentrix-dev-refresh-secret-key-must-be-at-least-256-bits-long-for-hs256
+      ML_SERVICE_URL: http://ml:8000
+      ML_INTERNAL_API_KEY: sentrix-ml-dev-key
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # Debug port
+    command: >
+      java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      -jar app.jar
+
+  ml:
+    environment:
+      ML_API_KEY: sentrix-ml-dev-key
+      LOG_LEVEL: DEBUG
+    ports:
+      - "8000:8000"
+
+  # In dev, don't use nginx — access services directly
+  nginx:
+    profiles:
+      - production-only
+
+  frontend:
+    profiles:
+      - production-only

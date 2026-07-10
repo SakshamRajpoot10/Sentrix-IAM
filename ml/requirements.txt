@@ -1,0 +1,33 @@
+# SENTRIX ML Service - Python Dependencies
+
+# Web Framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# ML / Data Science
+scikit-learn==1.6.1
+numpy==2.2.2
+pandas==2.2.3
+scipy==1.15.1
+joblib==1.4.2
+
+# Deep Learning
+torch==2.6.0
+torchvision==0.21.0
+
+# Database
+psycopg2-binary==2.9.10
+sqlalchemy==2.0.37
+
+# HTTP
+httpx==0.28.1
+
+# Utilities
+python-dotenv==1.0.1
+python-multipart==0.0.20
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.2

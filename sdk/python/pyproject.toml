@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentrix-sdk"
+version = "1.0.0"
+description = "Python SDK for Sentrix — AI Agent Governance, Runtime IAM & Anomaly Detection"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.8"
+authors = [
+    { name = "Sentrix Team" }
+]
+keywords = [
+    "ai",
+    "agent",
+    "security",
+    "governance",
+    "iam",
+    "sdk",
+    "sentrix",
+    "anomaly-detection",
+    "authorization",
+    "policy-engine",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Typing :: Typed",
+]
+dependencies = [
+    "requests>=2.28.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sentrix-ai/sentrix"
+Documentation = "https://github.com/sentrix-ai/sentrix#readme"
+Repository = "https://github.com/sentrix-ai/sentrix"
+"Bug Tracker" = "https://github.com/sentrix-ai/sentrix/issues"
+Changelog = "https://github.com/sentrix-ai/sentrix/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+include = ["sentrix*"]

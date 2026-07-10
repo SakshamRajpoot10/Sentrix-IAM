@@ -1,0 +1,52 @@
+# ═══════════════════════════════════════════════════════════════
+# SENTRIX — Production Profile
+# ═══════════════════════════════════════════════════════════════
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME:sentrix}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        generate_statistics: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+
+  flyway:
+    clean-disabled: true
+
+# ─── Logging (JSON structured) ──────────────────────────────
+logging:
+  level:
+    root: WARN
+    com.sentrix: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+
+# ─── Server hardening ───────────────────────────────────────
+server:
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+
+# ─── Actuator restricted ────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

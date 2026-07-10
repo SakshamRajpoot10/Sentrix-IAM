@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: sentrix-ml-service
+    env: docker
+    dockerfilePath: ml/Dockerfile
+    plan: free
+    envVars:
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PORT
+        value: 8000
+
+  - type: web
+    name: sentrix-backend-service
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ML_SERVICE_URL
+        fromService:
+          name: sentrix-ml-service
+          type: web
+          property: host
+      - key: ML_INTERNAL_API_KEY
+        value: sentrix-ml-internal-key
+      - key: ML_ENABLED
+        value: "true"
