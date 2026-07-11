@@ -28,8 +28,8 @@
   ],
   "n_features": 25,
   "sequence_length": 20,
-  "lstm_threshold": 0.7344637513160706,
-  "trained_at": "2026-07-10T23:14:01.706544",
+  "lstm_threshold": 1.0372214317321777,
+  "trained_at": "2026-07-11T18:40:06.351689",
   "training_samples": 5000,
-  "train_loss_final": 0.4236392080783844
+  "train_loss_final": 0.5398086905479431
 }

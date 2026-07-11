@@ -21,7 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,7 @@ public class AuthorizeService {
     private final MlService mlService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final StringRedisTemplate redisTemplate;
 
     @Value("${app.auto-revoke-threshold:0.8}")
     private double autoRevokeThreshold;
@@ -142,6 +145,14 @@ public class AuthorizeService {
             riskScore = mlService.getRiskScore(agentId);
         } catch (Exception e) {
             log.warn("ML service unavailable, using cached risk score: {}", riskScore);
+        }
+
+        // Cache risk score and max actions in Redis for O(1) rate limiting
+        try {
+            redisTemplate.opsForValue().set("agent_cache:risk_score:" + agentId, String.valueOf(riskScore), Duration.ofHours(1));
+            redisTemplate.opsForValue().set("agent_cache:max_actions:" + agentId, String.valueOf(agent.getMaxActionsPerMinute()), Duration.ofHours(1));
+        } catch (Exception e) {
+            log.warn("Failed to cache agent risk/limit in Redis: {}", e.getMessage());
         }
 
         // Record behavioral event

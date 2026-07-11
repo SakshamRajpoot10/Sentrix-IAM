@@ -13,6 +13,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Duration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Redis-backed rate limiting filter.
@@ -49,6 +51,28 @@ public class RateLimitFilter extends OncePerRequestFilter {
             category = "agent";
             limit = AGENT_LIMIT;
             window = Duration.ofMinutes(1);
+
+            // Adaptive rate limiting for authenticated agent requests
+            try {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_AGENT"))) {
+                    String agentId = (String) auth.getPrincipal();
+                    category = "agent:" + agentId;
+
+                    // Read cached risk score and max actions from Redis
+                    String riskStr = redisTemplate.opsForValue().get("agent_cache:risk_score:" + agentId);
+                    String maxActionsStr = redisTemplate.opsForValue().get("agent_cache:max_actions:" + agentId);
+
+                    double riskScore = riskStr != null ? Double.parseDouble(riskStr) : 0.0;
+                    int maxActions = maxActionsStr != null ? Integer.parseInt(maxActionsStr) : 60;
+
+                    // Compute dynamic limit: multiplier drops down from 1.0 down to 0.2 as risk score goes up
+                    double multiplier = 1.0 - (riskScore * 0.8);
+                    limit = Math.max(1, (int) (maxActions * multiplier));
+                }
+            } catch (Exception e) {
+                log.warn("Failed to calculate adaptive agent rate limit: {}", e.getMessage());
+            }
         } else if (path.startsWith("/api/")) {
             category = "general";
             limit = GENERAL_LIMIT;

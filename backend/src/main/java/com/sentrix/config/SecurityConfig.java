@@ -87,9 +87,9 @@ public class SecurityConfig {
                 .anyRequest().permitAll()
             )
 
-            // Filter order: RateLimit → JWT → UsernamePassword
-            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            // Filter order: JWT → RateLimit → UsernamePassword
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(rateLimitFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
