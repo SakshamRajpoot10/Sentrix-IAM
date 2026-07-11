@@ -12,7 +12,6 @@ services:
     name: sentrix-ml-service
     env: docker
     dockerfilePath: ml/Dockerfile
-    dockerContext: ml
     plan: free
     envVars:
       - key: DATABASE_URL
@@ -28,7 +27,6 @@ services:
     name: sentrix-backend-service
     env: docker
     dockerfilePath: backend/Dockerfile
-    dockerContext: backend
     plan: free
     envVars:
       - key: SPRING_PROFILES_ACTIVE

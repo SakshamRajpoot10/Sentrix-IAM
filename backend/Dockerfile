@@ -3,13 +3,14 @@ FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
 # Copy gradle files
-COPY gradle/ gradle/
-COPY gradlew gradlew.bat build.gradle settings.gradle gradle.properties ./
+COPY backend/gradle/ gradle/
+COPY backend/gradlew backend/gradlew.bat backend/build.gradle backend/settings.gradle backend/gradle.properties ./
 
 # Copy source
-COPY src/ src/
+COPY backend/src/ src/
 
 # Build application (skip tests for speed)
+RUN chmod +x gradlew
 RUN ./gradlew bootJar --no-daemon -x test
 
 # Stage 2: Runtime stage
