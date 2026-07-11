@@ -303,32 +303,64 @@ else:
 
 ## ☁️ Deployment
 
-### Google Cloud Platform
+Sentrix is fully configured to be deployed on **Free-Tier cloud infrastructure** with zero hosting costs.
 
-Sentrix is designed for deployment on Google Cloud Platform:
+### 1. Backend, ML Service, Database & Redis (Render)
+
+Render automatically provisions and connects your PostgreSQL, Redis cache, ML service, and Spring Boot API via the [render.yaml](render.yaml) Blueprint in this repository.
+
+1. Create a free account on [Render](https://render.com).
+2. Go to **Blueprints** -> **New Blueprint Instance**.
+3. Connect your GitHub repository `Sentrix-Agentic-IAM`.
+4. Render will read the `render.yaml` configuration and automatically spin up:
+   - **PostgreSQL Database** (`sentrix-db`)
+   - **Redis Cache** (`sentrix-redis`)
+   - **FastAPI ML Service** (`sentrix-ml-service`)
+   - **Spring Boot API** (`sentrix-backend-service`)
+5. Click **Apply** to deploy the services.
+
+### 2. Frontend (Vercel)
+
+Vercel serves as the production CDN host for the React/Vite frontend.
+
+1. Sign up/log in to [Vercel](https://vercel.com).
+2. Click **Add New** -> **Project**.
+3. Import your GitHub repository `Sentrix-Agentic-IAM`.
+4. In the Project Settings:
+   - **Framework Preset:** Select `Vite` (or let it auto-detect).
+   - **Root Directory:** Select `frontend`.
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+5. In the **Environment Variables** section, add:
+   - `VITE_API_URL`: Set this to your deployed Render backend URL (e.g., `https://sentrix-backend-service.onrender.com`).
+6. Click **Deploy**. Vercel will build and host your app on a free `*.vercel.app` subdomain.
+
+---
+
+### 🌐 Connecting a Custom Domain (Optional)
+
+If you own a custom domain (e.g., `sentrixiam.com`), you can link it to your deployments at no additional cost:
+
+#### For Vercel (Frontend)
+1. In your Vercel Dashboard, go to **Project Settings** -> **Domains**.
+2. Add your domain/subdomain (e.g., `app.sentrixiam.com`).
+3. Set the CNAME record in your domain registrar's DNS configuration to point to `cname.vercel-dns.com`.
+
+#### For Render (Backend)
+1. In the Render Dashboard, go to your `sentrix-backend-service` settings.
+2. Under **Custom Domains**, click **Add Custom Domain** and enter your API subdomain (e.g., `api.sentrixiam.com`).
+3. Add a CNAME record in your DNS configuration pointing to your Render subdomain URL.
+
+---
+
+### 🐳 Local Production Deployment (Docker Compose)
+
+To build and run the entire production-configured stack locally:
 
 ```bash
-# Build and push Docker images
-gcloud builds submit --tag gcr.io/PROJECT_ID/sentrix-backend ./backend
-gcloud builds submit --tag gcr.io/PROJECT_ID/sentrix-ml ./ml
-gcloud builds submit --tag gcr.io/PROJECT_ID/sentrix-frontend ./frontend
-
-# Deploy to Cloud Run
-gcloud run deploy sentrix-backend --image gcr.io/PROJECT_ID/sentrix-backend \
-  --platform managed --region us-central1 --allow-unauthenticated
-
-gcloud run deploy sentrix-ml --image gcr.io/PROJECT_ID/sentrix-ml \
-  --platform managed --region us-central1
-
-gcloud run deploy sentrix-frontend --image gcr.io/PROJECT_ID/sentrix-frontend \
-  --platform managed --region us-central1 --allow-unauthenticated
+docker-compose up -d --build
 ```
-
-### Docker Compose (Local)
-
-```bash
-docker-compose up -d
-```
+This starts all components (PostgreSQL, Redis, Java Backend, Python ML, React Frontend, and Nginx reverse proxy) in containerized mode on port 80/443.
 
 ---
 
