@@ -21,7 +21,7 @@ services:
       - key: ML_API_KEY
         value: sentrix-ml-internal-key
       - key: MODEL_DIR
-        value: /app/models/saved
+        value: /app/ml/models/saved
 
   - type: web
     name: sentrix-backend-service

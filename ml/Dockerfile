@@ -19,11 +19,11 @@ WORKDIR /app
 COPY ml/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY ml/ .
+# Copy application code as a package folder
+COPY ml/ ml/
 
 # Create model directory
-RUN mkdir -p models/saved && chown -R sentrix:sentrix /app
+RUN mkdir -p ml/models/saved && chown -R sentrix:sentrix /app
 
 USER sentrix
 
@@ -32,4 +32,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
   CMD python -c "import httpx; httpx.get('http://localhost:8000/health').raise_for_status()" || exit 1
 
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+CMD ["uvicorn", "ml.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
