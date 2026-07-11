@@ -16,11 +16,11 @@ RUN groupadd -r sentrix && useradd -r -g sentrix sentrix
 WORKDIR /app
 
 # Install Python dependencies
-COPY ml/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code as a package folder
-COPY ml/ ml/
+COPY . ml/
 
 # Create model directory
 RUN mkdir -p ml/models/saved && chown -R sentrix:sentrix /app

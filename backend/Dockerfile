@@ -3,11 +3,11 @@ FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
 # Copy gradle files
-COPY backend/gradle/ gradle/
-COPY backend/gradlew backend/gradlew.bat backend/build.gradle backend/settings.gradle backend/gradle.properties ./
+COPY gradle/ gradle/
+COPY gradlew gradlew.bat build.gradle settings.gradle gradle.properties ./
 
 # Copy source
-COPY backend/src/ src/
+COPY src/ src/
 
 # Build application (skip tests for speed)
 RUN chmod +x gradlew
