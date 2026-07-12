@@ -349,7 +349,7 @@ public class BillingService {
             case PRO -> {
                 org.setPlan(SubscriptionPlan.PRO);
                 org.setAgentLimit(50);
-                org.setPolicyLimit(100);
+                org.setPolicyLimit(150);
                 org.setApiCallLimit(500000);
                 org.setAuditRetentionDays(90);
             }
