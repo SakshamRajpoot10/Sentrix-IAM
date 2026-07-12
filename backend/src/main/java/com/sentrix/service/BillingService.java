@@ -51,7 +51,7 @@ public class BillingService {
         return List.of(
                 PlanResponse.builder()
                         .id("FREE").name("FREE").displayName("Free")
-                        .priceMonthly(200).currency("INR")
+                        .priceMonthly(0).currency("INR")
                         .agentLimit(5).policyLimit(10).apiCallLimit(10000).auditRetentionDays(7)
                         .features(List.of(
                                 Map.of("name", "5 Active Agents", "included", true),
@@ -65,7 +65,7 @@ public class BillingService {
 
                 PlanResponse.builder()
                         .id("PRO").name("PRO").displayName("Pro")
-                        .priceMonthly(300).currency("INR")
+                        .priceMonthly(490000).currency("INR")
                         .agentLimit(50).policyLimit(100).apiCallLimit(500000).auditRetentionDays(90)
                         .features(List.of(
                                 Map.of("name", "50 Active Agents", "included", true),
@@ -81,7 +81,7 @@ public class BillingService {
 
                 PlanResponse.builder()
                         .id("ENTERPRISE").name("ENTERPRISE").displayName("Enterprise")
-                        .priceMonthly(500).currency("INR")
+                        .priceMonthly(1999900).currency("INR")
                         .agentLimit(Integer.MAX_VALUE).policyLimit(Integer.MAX_VALUE)
                         .apiCallLimit(Integer.MAX_VALUE).auditRetentionDays(365)
                         .features(List.of(
